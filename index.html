@@ -270,6 +270,63 @@ p.sub{color:var(--muted);margin:0;max-width:460px;line-height:1.5}
 .hud{display:flex;gap:10px;justify-content:center;margin:4px 0 16px;font-family:var(--mono);font-size:.84rem;color:var(--muted);flex-wrap:wrap}
 .hud b{color:var(--ink)}
 .combo-tag{color:var(--combo);text-shadow:0 0 8px var(--combo-glow)}
+
+/* Live fight statistics and progression */
+.campaign-progress{width:100%;max-width:1060px;margin:0 auto 13px;text-align:left}
+.campaign-progress-head,.sentence-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font:700 .7rem var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.campaign-progress-head strong,.sentence-progress-head strong{color:var(--ink);font-weight:700;letter-spacing:.04em}
+.progress-track{height:7px;width:100%;border-radius:99px;background:var(--hp-back);border:1px solid var(--line);overflow:hidden}
+.progress-track>span{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--p-d),var(--p));box-shadow:0 0 12px var(--hp-me-glow);transition:width .28s ease}
+.fight-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%;max-width:1060px;margin:0 auto 13px}
+.fight-stat{min-width:0;background:linear-gradient(155deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;padding:12px 15px;text-align:left;box-shadow:var(--panel-shadow)}
+.fight-stat span{display:block;color:var(--muted);font:700 .64rem var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.fight-stat b{display:block;font:700 1.3rem var(--mono);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fight-stat.speed b{color:var(--blue)}.fight-stat.accuracy b{color:var(--p)}.fight-stat.combo b{color:var(--combo)}.fight-stat.damage b{color:var(--crit)}
+.sentence-progress{width:100%;max-width:1060px;margin:0 auto 9px;text-align:left}
+.sentence-progress .progress-track{height:5px}
+.sentence-progress .progress-track>span{background:linear-gradient(90deg,var(--blue),var(--p));box-shadow:none}
+@media(max-width:700px){.fight-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.fight-stat{padding:10px 12px}.fight-stat b{font-size:1.12rem}}
+
+/* Combat motion: a short forward strike, readable impact, and sharper critical feedback. */
+.stage{isolation:isolate}
+.stage.attack-lunge .stick{animation:playerStrike .34s cubic-bezier(.2,.8,.25,1) both}
+.stage.counter-lunge .stick{animation:enemyStrike .34s cubic-bezier(.2,.8,.25,1) both}
+.stage.impact-hit::after{content:"";position:absolute;inset:12% 12%;border-radius:50%;background:radial-gradient(circle,var(--burst-en),transparent 68%);opacity:0;pointer-events:none;animation:impactFlash .42s ease-out}
+.stage.player-impact::after{background:radial-gradient(circle,var(--burst-me),transparent 68%)}
+.stage.critical-impact::before{content:"";position:absolute;inset:8% 8%;border:2px solid var(--crit);border-radius:50%;opacity:0;pointer-events:none;animation:criticalRing .52s ease-out}
+@keyframes playerStrike{0%{transform:translateX(0) rotate(0) scale(1)}38%{transform:translateX(34px) rotate(8deg) scale(1.08)}70%{transform:translateX(24px) rotate(-3deg) scale(1.04)}100%{transform:translateX(0) rotate(0) scale(1)}}
+@keyframes enemyStrike{0%{transform:translateX(0) rotate(0)}40%{transform:translateX(-30px) rotate(-9deg) scale(1.06)}72%{transform:translateX(-18px) rotate(4deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes impactFlash{0%{opacity:.95;transform:scale(.25)}35%{opacity:.75;transform:scale(1.05)}100%{opacity:0;transform:scale(1.7)}}
+@keyframes criticalRing{0%{opacity:.95;transform:scale(.25)}100%{opacity:0;transform:scale(1.65)}}
+.combat-spark{position:absolute;left:50%;top:48%;width:5px;height:22px;border-radius:99px;background:var(--spark-color,var(--crit));z-index:6;pointer-events:none;box-shadow:0 0 9px var(--spark-color,var(--crit));animation:sparkFly .42s cubic-bezier(.12,.7,.24,1) forwards}
+@keyframes sparkFly{0%{opacity:0;transform:translate(-50%,-50%) scale(.45) rotate(var(--rot))}18%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2) rotate(calc(var(--rot) + 110deg))}}
+.arena.combo-surge{animation:comboSurge .42s ease-out}
+@keyframes comboSurge{0%{filter:none}40%{filter:drop-shadow(0 0 16px var(--combo-glow))}100%{filter:none}}
+.arena.ko-shake{animation:koShake .42s ease-in-out}
+@keyframes koShake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}38%{transform:translateX(6px)}58%{transform:translateX(-4px)}78%{transform:translateX(2px)}}
+
+/* Distinct attack silhouettes make each completed sentence feel like a different move. */
+.stage.move-jab .stick{animation:moveJab .42s cubic-bezier(.2,.8,.25,1) both;}
+.stage.move-cross .stick{animation:moveCross .48s cubic-bezier(.18,.76,.2,1) both;}
+.stage.move-sweep .stick{animation:moveSweep .5s cubic-bezier(.2,.8,.25,1) both;}
+.stage.move-heavy .stick{animation:moveHeavy .58s cubic-bezier(.15,.75,.2,1) both;}
+.stage.move-rush .stick{animation:moveRush .52s cubic-bezier(.18,.8,.18,1) both;}
+.stage.move-finisher .stick{animation:moveFinisher .64s cubic-bezier(.16,.82,.2,1) both;}
+.stage.counter-quick .stick{animation:counterQuick .4s ease-out both;}
+.stage.counter-heavy .stick{animation:counterHeavy .58s cubic-bezier(.2,.7,.2,1) both;}
+.stage.impact-heavy::before{content:"";position:absolute;inset:8%;border:3px solid var(--crit);border-radius:28%;opacity:0;pointer-events:none;animation:heavyRing .55s ease-out;}
+.stage.impact-sweep::before{content:"";position:absolute;left:13%;right:13%;bottom:18%;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);box-shadow:0 0 14px var(--blue);opacity:0;pointer-events:none;animation:sweepLine .5s ease-out;}
+@keyframes moveJab{0%{transform:translate(0,0) rotate(0)}35%{transform:translate(28px,-2px) rotate(5deg)}58%{transform:translate(33px,-1px) rotate(2deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes moveCross{0%{transform:translate(0,0) rotate(0)}30%{transform:translate(15px,-8px) rotate(-7deg)}62%{transform:translate(34px,2px) rotate(13deg) scale(1.05)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes moveSweep{0%{transform:translate(0,0) rotate(0)}35%{transform:translate(15px,8px) rotate(13deg)}65%{transform:translate(30px,6px) rotate(-8deg) scale(1.03)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes moveHeavy{0%{transform:translate(0,0) rotate(0) scale(1)}28%{transform:translate(-5px,-8px) rotate(-8deg) scale(1.02)}62%{transform:translate(34px,0) rotate(16deg) scale(1.12)}82%{transform:translate(17px,1px) rotate(6deg) scale(1.06)}100%{transform:translate(0,0) rotate(0) scale(1)}}
+@keyframes moveRush{0%{transform:translate(0,0) scale(1)}24%{transform:translate(12px,-5px) scale(1.04)}48%{transform:translate(34px,-2px) rotate(8deg) scale(1.13)}72%{transform:translate(20px,2px) rotate(-5deg) scale(1.06)}100%{transform:translate(0,0) rotate(0) scale(1)}}
+@keyframes moveFinisher{0%{transform:translate(0,0) scale(1)}24%{transform:translate(0,-12px) rotate(-6deg) scale(1.08)}56%{transform:translate(42px,-2px) rotate(15deg) scale(1.2)}78%{transform:translate(22px,2px) rotate(-6deg) scale(1.08)}100%{transform:translate(0,0) rotate(0) scale(1)}}
+@keyframes counterQuick{0%{transform:translate(0,0)}42%{transform:translate(-22px,0) rotate(-6deg)}100%{transform:translate(0,0)}}
+@keyframes counterHeavy{0%{transform:translate(0,0)}25%{transform:translate(4px,-8px) rotate(7deg)}62%{transform:translate(-34px,1px) rotate(-15deg) scale(1.1)}100%{transform:translate(0,0) rotate(0) scale(1)}}
+@keyframes heavyRing{0%{opacity:.9;transform:scale(.65) rotate(0)}100%{opacity:0;transform:scale(1.25) rotate(18deg)}}
+@keyframes sweepLine{0%{opacity:0;transform:scaleX(.2)}28%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.1) translateY(-16px)}}
+@media(prefers-reduced-motion:reduce){.stage.attack-lunge .stick,.stage.counter-lunge .stick,.stage.impact-hit::after,.stage.critical-impact::before,.combat-spark,.arena.combo-surge,.arena.ko-shake{animation-duration:.01ms!important}}
 .target{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 18px;font-family:var(--mono);font-size:1.22rem;letter-spacing:.01em;line-height:1.7;text-align:center;min-height:68px;box-shadow:0 10px 28px -18px rgba(0,0,0,.6);overflow-wrap:break-word;word-break:break-word}
 .target span{display:inline}
 .target .c-ok{color:var(--p)}
@@ -319,6 +376,134 @@ p.sub{color:var(--muted);margin:0;max-width:460px;line-height:1.5}
   .stage{height:224px;min-height:224px;padding-top:18px;align-items:center;overflow:visible}
   .stage .stick{width:98px;height:182px;flex:0 0 auto;display:block;overflow:visible}
 }
+
+/* Dashboard + compact desktop battle viewport */
+.dashboard-screen{width:min(100%,1120px);margin:0 auto;display:flex;flex-direction:column;gap:22px;padding:8px 0 28px;}
+.dashboard-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;text-align:left;}
+.dashboard-heading .sub{max-width:620px;margin-top:7px;}
+.dashboard-profile{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.72fr);gap:18px;align-items:center;background:linear-gradient(150deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:22px;padding:22px 24px;box-shadow:var(--panel-shadow);}
+.dashboard-profile-copy .eyebrow{font:700 .68rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--p);margin-bottom:8px;}
+.dashboard-profile-copy h2{font-size:1.35rem;margin:0 0 6px;}
+.dashboard-profile-copy p{color:var(--muted);font-size:.88rem;line-height:1.5;margin:0;}
+.nickname-form{display:flex;gap:9px;align-items:center;min-width:0;}
+.nickname-input{width:100%;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:11px;color:var(--ink);font:600 .9rem var(--font);padding:12px 13px;outline:none;}
+.nickname-input:focus{border-color:var(--p);box-shadow:0 0 0 3px color-mix(in srgb,var(--p) 15%,transparent);}
+.nickname-save{font:700 .82rem var(--font);white-space:nowrap;border:0;border-radius:11px;padding:12px 15px;background:var(--p);color:var(--button-text);cursor:pointer;}
+.dash-save-note{font-size:.72rem;color:var(--p);min-height:1em;margin-top:5px;text-align:right;}
+.dashboard-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+.dashboard-stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--panel-shadow);min-width:0;}
+.dashboard-stat span{display:block;font:700 .64rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.dashboard-stat b{display:block;font:700 clamp(1.25rem,2vw,1.7rem) var(--mono);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dashboard-stat small{display:block;color:var(--muted);font-size:.72rem;margin-top:5px;}
+.dashboard-lower{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:16px;}
+.dashboard-panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:19px 20px;box-shadow:var(--panel-shadow);text-align:left;}
+.dashboard-panel h3{margin:0 0 13px;font-size:1rem;}
+.recent-list{display:flex;flex-direction:column;gap:0;}
+.recent-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--divider);}
+.recent-item:last-child{border-bottom:0;}
+.recent-item strong{display:block;font-size:.82rem;color:var(--ink);}
+.recent-item span{display:block;font-size:.72rem;color:var(--muted);margin-top:3px;}
+.recent-result{text-align:right;font:700 .82rem var(--mono);color:var(--p);white-space:nowrap;}
+.dashboard-empty{color:var(--muted);font-size:.84rem;line-height:1.55;padding:8px 0 3px;}
+.dashboard-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.home-actions .dashboard-btn{padding:12px 18px;font-size:.9rem;}
+
+/* Keep the entire live battle on screen at desktop sizes: the text area and arena share available height. */
+body[data-screen="fight"]{height:100%;height:100dvh;overflow:hidden;}
+body[data-screen="fight"] .wrap{width:100%;max-width:1480px;height:100%;height:100dvh;min-height:0;display:flex;flex-direction:column;padding:12px clamp(18px,3vw,44px) 14px;}
+body[data-screen="fight"] header{flex:0 0 auto;margin-bottom:8px;}
+body[data-screen="fight"] #app{flex:1 1 auto;min-height:0;display:flex;align-items:stretch;justify-content:center;}
+body[data-screen="fight"] .fight-screen{width:min(100%,1320px);height:100%;min-height:0;margin:0 auto;display:grid;grid-template-rows:auto auto auto minmax(150px,1fr) auto auto auto minmax(76px,.55fr) 0px;gap:clamp(4px,.75vh,8px);align-content:stretch;justify-content:stretch;}
+body[data-screen="fight"] .fight-topbar{margin:0;}
+body[data-screen="fight"] .campaign-progress{margin:0 auto;}
+body[data-screen="fight"] .campaign-progress-head{margin-bottom:4px;font-size:.62rem;}
+body[data-screen="fight"] .progress{margin:0;font-size:1rem;gap:11px;}
+body[data-screen="fight"] .arena{min-height:0;margin:0;gap:clamp(10px,1.5vw,20px);}
+body[data-screen="fight"] .fighter{min-height:0;padding:8px clamp(12px,2vw,22px) 9px;display:flex;flex-direction:column;justify-content:space-between;}
+body[data-screen="fight"] .fighter .name{font-size:.86rem;margin-bottom:2px;}
+body[data-screen="fight"] .stage{height:clamp(112px,18vh,174px);min-height:0;flex:1 1 auto;padding:0;}
+body[data-screen="fight"] .stage .stick{width:clamp(72px,7vw,94px);height:auto;aspect-ratio:70/130;}
+body[data-screen="fight"] .boss-shield-visual{width:clamp(112px,11vw,150px);height:clamp(124px,18vh,170px);top:0;}
+body[data-screen="fight"] .hpwrap{height:11px;margin-top:6px;flex:0 0 auto;}
+body[data-screen="fight"] .hud{margin:0;gap:16px;font-size:.75rem;}
+body[data-screen="fight"] .fight-stats{margin:0 auto;gap:8px;}
+body[data-screen="fight"] .fight-stat{padding:7px 12px;border-radius:12px;}
+body[data-screen="fight"] .fight-stat span{font-size:.58rem;margin-bottom:3px;}
+body[data-screen="fight"] .fight-stat b{font-size:1.08rem;}
+body[data-screen="fight"] .sentence-progress{margin:0 auto;}
+body[data-screen="fight"] .sentence-progress-head{font-size:.61rem;margin-bottom:3px;}
+body[data-screen="fight"] .sentence-progress .progress-track{height:4px;}
+body[data-screen="fight"] .target.combat-target{width:min(100%,1120px);max-width:1120px;margin:0 auto;min-height:76px;max-height:clamp(88px,15vh,126px);padding:11px 24px;font-size:clamp(1rem,1.25vw,1.22rem);line-height:1.6;overflow-y:auto;align-self:center;}
+body[data-screen="fight"] #typebox{position:fixed!important;left:0!important;top:0!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;}
+@media(max-height:760px) and (min-width:900px){
+  body[data-screen="fight"] .wrap{padding-top:7px;padding-bottom:8px;}
+  body[data-screen="fight"] header{margin-bottom:4px;}
+  body[data-screen="fight"] .fight-screen{grid-template-rows:auto auto auto minmax(124px,1fr) auto auto auto minmax(68px,.5fr) 0px;gap:4px;}
+  body[data-screen="fight"] .fighter{padding:5px 14px 6px;}
+  body[data-screen="fight"] .stage{height:clamp(96px,16vh,132px);}
+  body[data-screen="fight"] .fight-stat{padding:5px 10px;}
+  body[data-screen="fight"] .target.combat-target{min-height:66px;max-height:12vh;padding:8px 18px;font-size:1rem;line-height:1.5;}
+}
+@media(max-width:899px){
+  .dashboard-profile,.dashboard-lower{grid-template-columns:1fr;}
+  .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .nickname-form{max-width:520px;}
+  body[data-screen="fight"]{height:auto;overflow-x:hidden;overflow-y:auto;}
+  body[data-screen="fight"] .wrap{height:auto;min-height:100dvh;padding:14px 16px 26px;}
+  body[data-screen="fight"] #app{display:block;}
+  body[data-screen="fight"] .fight-screen{height:auto;min-height:0;display:flex;}
+  body[data-screen="fight"] .fighter{min-height:190px;}
+  body[data-screen="fight"] .stage{height:140px;min-height:140px;}
+  body[data-screen="fight"] .target.combat-target{max-height:none;}
+}
+@media(max-width:560px){.dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr));}.dashboard-profile{padding:18px;}.nickname-form{flex-wrap:wrap;}.nickname-save{width:100%;}}
+
+
+/* Extra combat variety: rising strikes, rotations, dash-ins and opponent specials. */
+.stage.move-uppercut .stick{animation:moveUppercut .54s cubic-bezier(.16,.82,.22,1) both;}
+.stage.move-spin .stick{animation:moveSpin .64s cubic-bezier(.18,.75,.18,1) both;}
+.stage.move-dash .stick{animation:moveDash .48s cubic-bezier(.15,.84,.2,1) both;}
+.stage.move-double .stick{animation:moveDouble .60s cubic-bezier(.18,.8,.2,1) both;}
+.stage.counter-uppercut .stick{animation:counterUppercut .52s cubic-bezier(.2,.8,.2,1) both;}
+.stage.counter-double .stick{animation:counterDouble .60s cubic-bezier(.18,.8,.2,1) both;}
+.stage.counter-slam .stick{animation:counterSlam .66s cubic-bezier(.16,.8,.18,1) both;}
+.stage.impact-uppercut::before{content:"";position:absolute;left:22%;right:22%;top:20%;height:46%;border:2px solid var(--crit);border-bottom:0;border-radius:50% 50% 0 0;opacity:0;pointer-events:none;animation:uppercutArc .55s ease-out;}
+.stage.impact-spin::before{content:"";position:absolute;inset:14%;border:3px dashed var(--blue);border-radius:50%;opacity:0;pointer-events:none;animation:spinRing .62s ease-out;}
+.stage.impact-double::before{content:"";position:absolute;inset:18% 10%;border-top:3px solid var(--crit);border-bottom:3px solid var(--crit);opacity:0;pointer-events:none;animation:doubleFlash .58s ease-out;}
+.stage.impact-dash::before{content:"";position:absolute;left:5%;right:5%;top:47%;height:4px;background:linear-gradient(90deg,transparent,var(--p),var(--blue),transparent);opacity:0;pointer-events:none;animation:dashTrail .5s ease-out;}
+@keyframes moveUppercut{0%{transform:translate(0,0) rotate(0)}28%{transform:translate(-5px,8px) rotate(-7deg)}62%{transform:translate(27px,-24px) rotate(13deg) scale(1.1)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes moveSpin{0%{transform:translate(0,0) rotate(0) scale(1)}35%{transform:translate(12px,-5px) rotate(115deg) scale(1.08)}72%{transform:translate(28px,0) rotate(300deg) scale(1.12)}100%{transform:translate(0,0) rotate(360deg) scale(1)}}
+@keyframes moveDash{0%{transform:translateX(0) scale(1)}22%{transform:translateX(-8px) scale(.96)}62%{transform:translateX(42px) scale(1.12)}100%{transform:translateX(0) scale(1)}}
+@keyframes moveDouble{0%{transform:translateX(0) rotate(0)}24%{transform:translateX(25px) rotate(8deg)}43%{transform:translateX(3px) rotate(-3deg)}68%{transform:translateX(34px) rotate(11deg) scale(1.08)}100%{transform:translateX(0) rotate(0)}}
+@keyframes counterUppercut{0%{transform:translate(0,0)}32%{transform:translate(-8px,7px) rotate(8deg)}68%{transform:translate(-31px,-19px) rotate(-13deg) scale(1.08)}100%{transform:translate(0,0)}}
+@keyframes counterDouble{0%{transform:translateX(0)}28%{transform:translateX(-24px) rotate(-7deg)}48%{transform:translateX(-4px) rotate(2deg)}72%{transform:translateX(-32px) rotate(-10deg) scale(1.08)}100%{transform:translateX(0)}}
+@keyframes counterSlam{0%{transform:translateY(0) rotate(0)}27%{transform:translateY(-12px) rotate(5deg)}65%{transform:translate(-30px,8px) rotate(-16deg) scale(1.12)}100%{transform:translateY(0) rotate(0)}}
+@keyframes uppercutArc{0%{opacity:0;transform:translateY(18px) scale(.7)}35%{opacity:.95}100%{opacity:0;transform:translateY(-22px) scale(1.2)}}
+@keyframes spinRing{0%{opacity:0;transform:scale(.55) rotate(0)}35%{opacity:.9}100%{opacity:0;transform:scale(1.35) rotate(220deg)}}
+@keyframes doubleFlash{0%{opacity:0;transform:scaleX(.35)}32%{opacity:1}100%{opacity:0;transform:scaleX(1.35)}}
+@keyframes dashTrail{0%{opacity:0;transform:scaleX(.1)}30%{opacity:.9}100%{opacity:0;transform:scaleX(1.15)}}
+@media(prefers-reduced-motion:reduce){.stage.move-uppercut .stick,.stage.move-spin .stick,.stage.move-dash .stick,.stage.move-double .stick,.stage.counter-uppercut .stick,.stage.counter-double .stick,.stage.counter-slam .stick,.stage.impact-uppercut::before,.stage.impact-spin::before,.stage.impact-double::before,.stage.impact-dash::before{animation-duration:.01ms!important}}
+
+/* The passage scrolls inside its own panel; keep the desktop document fixed. */
+@media(min-width:900px){
+  body[data-screen="speedtest"]{height:100vh;height:100dvh;overflow:hidden;}
+  body[data-screen="speedtest"] .wrap{width:100%;max-width:1480px;height:100vh;height:100dvh;min-height:0;display:flex;flex-direction:column;padding:12px clamp(18px,3vw,44px) 14px;}
+  body[data-screen="speedtest"] header{flex:0 0 auto;margin-bottom:10px;}
+  body[data-screen="speedtest"] #app{flex:1 1 auto;min-height:0;display:flex;align-items:stretch;justify-content:center;overflow:hidden;}
+  body[data-screen="speedtest"] .speed-screen{width:min(100%,1120px);height:100%;min-height:0;margin:0 auto;padding:6px 0;display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.7vh,18px);}
+  body[data-screen="speedtest"] .speed-test-toolbar{flex:0 0 auto;width:min(100%,1040px);}
+  body[data-screen="speedtest"] .speed-viewport{width:min(100%,1000px);height:clamp(220px,43vh,420px);flex:0 1 auto;min-height:0;}
+  body[data-screen="speedtest"] .target.speed-target{font-size:clamp(1rem,1.18vw,1.2rem);line-height:1.85;padding:clamp(17px,2vw,28px) clamp(20px,3vw,38px);}
+  body[data-screen="speedtest"] .speed-screen>.hint{margin:0;flex:0 0 auto;}
+}
+@media(max-height:690px) and (min-width:900px){
+  body[data-screen="speedtest"] .wrap{padding-top:7px;padding-bottom:8px;}
+  body[data-screen="speedtest"] header{margin-bottom:5px;}
+  body[data-screen="speedtest"] .speed-screen{gap:8px;padding:2px 0;}
+  body[data-screen="speedtest"] .speed-viewport{height:clamp(190px,38vh,300px);}
+  body[data-screen="speedtest"] .target.speed-target{line-height:1.65;padding:14px 24px;}
+}
+
 </style>
 </head>
 <body>
@@ -460,9 +645,11 @@ let state = {
   combo:0, comboMax:4, shield:false,
   queue:[], current:"", typed:"", mistakesThisSentence:0, consecWrong:0,
   ignoreNextSpace:false, sentenceStart:0, idleTimer:null, pauseStartedAt:0, defeatTimer:null,
+  fightStartedAt:0, fightPausedAt:0, fightPausedTotal:0, statsTimer:null, levelDamageDealt:0, bestSentenceWpm:0,
+  profileStageRecorded:false, profileCampaignRecorded:false, attackCount:0, enemyCounterCount:0,
   totalSentences:0, perfectSentences:0, correctChars:0, mistakeKeys:0, wpmSum:0, wpmCount:0,
   tutorialSeen:false, muted:false,
-  run:{sentences:0, perfect:0, correctChars:0, mistakeKeys:0, wpmSum:0, wpmCount:0, damageDealt:0}
+  run:{sentences:0, perfect:0, correctChars:0, mistakeKeys:0, wpmSum:0, wpmCount:0, damageDealt:0, bestWpm:0}
 };
 let tutTypedLen = 0;
 let speedState = null;
@@ -496,6 +683,66 @@ function saveHighScores(){
   catch(e){ /* The game remains playable if browser storage is disabled. */ }
 }
 let highScores = loadHighScores();
+
+/* ---------------- PERSONAL PROFILE + LIFETIME STATISTICS ---------------- */
+const PROFILE_KEY = "typefight.profile.v1";
+function emptyProfile(){
+  return {
+    nickname:"Player",
+    stats:{fightsPlayed:0,fightsWon:0,campaignsStarted:0,campaignsWon:0,speedTests:0,bestSpeedWpm:0,bestFightWpm:0,totalCorrectChars:0,totalMistakes:0,totalSentences:0,totalDamage:0,totalTypingMs:0},
+    recent:[]
+  };
+}
+function loadProfile(){
+  const fallback = emptyProfile();
+  try{
+    const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+    if(!saved || typeof saved !== "object") return fallback;
+    const stats = saved.stats || {};
+    Object.keys(fallback.stats).forEach(key=>{
+      const value = Number(stats[key]);
+      fallback.stats[key] = Number.isFinite(value) && value >= 0 ? value : 0;
+    });
+    fallback.nickname = String(saved.nickname || "Player").trim().slice(0,18) || "Player";
+    fallback.recent = Array.isArray(saved.recent) ? saved.recent.slice(0,8).filter(x=>x && typeof x === "object").map(x=>({
+      mode:String(x.mode || "Practice").slice(0,24), label:String(x.label || "Session").slice(0,50),
+      wpm:Math.max(0,Number(x.wpm)||0), accuracy:Math.max(0,Math.min(100,Number(x.accuracy)||0)),
+      date:String(x.date || "")
+    })) : [];
+  }catch(e){ /* Profiles are optional; the game stays usable if storage is blocked. */ }
+  return fallback;
+}
+let profile = loadProfile();
+function saveProfile(){
+  try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));}
+  catch(e){/* Keep in-memory statistics for this visit if storage is unavailable. */}
+}
+function profileOverallAccuracy(){
+  const attempts = profile.stats.totalCorrectChars + profile.stats.totalMistakes;
+  return attempts ? Math.round(profile.stats.totalCorrectChars/attempts*100) : 0;
+}
+function addProfileActivity({mode,label,wpm,accuracy,correctChars,mistakes,durationMs}){
+  profile.stats.totalCorrectChars += Math.max(0,correctChars||0);
+  profile.stats.totalMistakes += Math.max(0,mistakes||0);
+  profile.stats.totalTypingMs += Math.max(0,durationMs||0);
+  profile.recent.unshift({mode,label,wpm:Math.max(0,wpm||0),accuracy:Math.max(0,accuracy||0),date:new Date().toISOString()});
+  profile.recent = profile.recent.slice(0,8);
+  saveProfile();
+}
+function recordFightProfileResult(won){
+  if(state.profileStageRecorded) return;
+  const stats = statsFrom(state.correctChars,state.mistakeKeys,state.wpmSum,state.wpmCount);
+  profile.stats.fightsPlayed++;
+  if(won) profile.stats.fightsWon++;
+  profile.stats.totalSentences += state.totalSentences;
+  profile.stats.totalDamage += state.levelDamageDealt;
+  profile.stats.bestFightWpm = Math.max(profile.stats.bestFightWpm,state.bestSentenceWpm||0);
+  addProfileActivity({
+    mode:won?"Fight won":"Fight ended",label:FIGHTERS[state.levelIdx].name+" · "+TIER_INFO[state.tier].label,
+    wpm:stats.avgWpm,accuracy:stats.accuracy,correctChars:state.correctChars,mistakes:state.mistakeKeys,durationMs:fightElapsedMs()
+  });
+  state.profileStageRecorded = true;
+}
 
 const THEME_STORAGE_KEY = "typefight.theme.v2";
 function loadTheme(){
@@ -632,12 +879,22 @@ function genWords(n){
 
 /* ---------------- FIGHT FLOW ---------------- */
 function resetRun(){
-  state.run = {sentences:0, perfect:0, correctChars:0, mistakeKeys:0, wpmSum:0, wpmCount:0, damageDealt:0};
+  state.run = {sentences:0, perfect:0, correctChars:0, mistakeKeys:0, wpmSum:0, wpmCount:0, damageDealt:0, bestWpm:0};
 }
 function startLevel(i){
   clearTimeout(state.defeatTimer);
+  clearInterval(state.statsTimer);
+  state.statsTimer = null;
   state.defeatTimer = null;
   state.pauseStartedAt = 0;
+  state.fightStartedAt = 0; // Live typing statistics begin on the first keypress.
+  state.fightPausedAt = 0;
+  state.fightPausedTotal = 0;
+  state.levelDamageDealt = 0;
+  state.bestSentenceWpm = 0;
+  state.profileStageRecorded = false;
+  state.attackCount = 0;
+  state.enemyCounterCount = 0;
   const lv = fighterAt(i);
   state.levelIdx = i;
   state.enemyHp = lv.hp; state.enemyMaxHp = lv.hp;
@@ -669,7 +926,7 @@ function onType(ch){
     if(ch === " ") return;
   }
   const target = state.current;
-  if(state.typed.length === 0) state.sentenceStart = Date.now();
+  if(!state.sentenceStart) state.sentenceStart = Date.now();
   resetIdle();
 
   if(ch === "Backspace"){
@@ -679,9 +936,11 @@ function onType(ch){
       state.run.correctChars = Math.max(0, state.run.correctChars - 1);
       setCursor("targetBox", target, state.typed.length);
     }
+    updateFightStats();
     return;
   }
   if(ch.length !== 1) return;
+  if(!state.fightStartedAt) state.fightStartedAt = Date.now();
 
   const idx = state.typed.length;
   if(idx >= target.length) return;
@@ -697,17 +956,35 @@ function onType(ch){
     flashBad("targetBox", idx);
     sndBad();
     popText("miss", false, "me");
+    updateFightStats();
     if(state.consecWrong >= MISTAKE_LIMIT) enemyCounters();
     return;
   }
+  updateFightStats();
   if(state.typed.length === target.length){
     finishSentence();
     if(state.screen !== "fight") return;
     state.ignoreNextSpace = true;
     buildSpanBox("targetBox", state.current);
+    updateFightStats();
   }
 }
 
+function chooseCombatMove(critical,wpm,wpmGoal){
+  if(critical) return {key:"finisher",label:"PERFECT FINISHER"};
+  if(wpm >= wpmGoal*1.18) return {key:"rush",label:"SPEED RUSH"};
+  if(state.combo >= 3 && state.attackCount % 3 === 2) return {key:"spin",label:"COMBO SPIN"};
+  const sequence=[
+    {key:"jab",label:"QUICK STRIKE"},
+    {key:"cross",label:"CROSS HIT"},
+    {key:"sweep",label:"LOW SWEEP"},
+    {key:"uppercut",label:"RISING UPPERCUT"},
+    {key:"heavy",label:"POWER BLOW"},
+    {key:"double",label:"DOUBLE STRIKE"},
+    {key:"dash",label:"DASH ATTACK"}
+  ];
+  return sequence[state.attackCount % sequence.length];
+}
 function finishSentence(){
   const lv = fighterAt(state.levelIdx);
   const ms = Date.now() - state.sentenceStart;
@@ -717,16 +994,21 @@ function finishSentence(){
   });
   state.totalSentences++; state.run.sentences++;
   state.wpmSum += wpm; state.wpmCount++; state.run.wpmSum += wpm; state.run.wpmCount++;
+  state.bestSentenceWpm = Math.max(state.bestSentenceWpm, wpm);
+  state.run.bestWpm = Math.max(state.run.bestWpm || 0, wpm);
 
   if(perfect){
     state.perfectSentences++; state.run.perfect++;
     const before = state.combo;
     state.combo = Math.min(state.combo+1, state.comboMax);
-    if(state.combo > before) popText("COMBO x"+(1+state.combo*0.25).toFixed(2), false, "me");
+    if(state.combo > before){
+      popText("COMBO x"+(1+state.combo*0.25).toFixed(2), false, "me");
+      if(state.combo >= 2) pulseCombo();
+    }
   } else state.combo = 0;
 
   if(state.shield){
-    if(perfect){ state.shield = false; popText("SHIELD BROKEN", true, "en"); spawnBurst("enemy"); addFlinch("enemy"); sndHit(true); }
+    if(perfect){ state.shield = false; popText("SHIELD BROKEN", true, "en"); animatePlayerStrike("finisher",true); sndHit(true); }
     else {
       popText("shield holds", false, "en");
       enemyCounters();
@@ -736,8 +1018,11 @@ function finishSentence(){
   } else {
     state.enemyHp = Math.max(0, state.enemyHp - dmg);
     state.run.damageDealt += dmg;
-    popText((crit? "CRIT " : "") + "-" + dmg, crit, "en");
-    spawnBurst("enemy"); addFlinch("enemy"); sndHit(crit);
+    state.levelDamageDealt += dmg;
+    const move = chooseCombatMove(crit,wpm,lv.wpmGoal);
+    state.attackCount++;
+    popText(move.label+" · -"+dmg, crit, "en");
+    animatePlayerStrike(move.key,crit); sndHit(crit);
   }
 
   if(!perfect){
@@ -751,10 +1036,22 @@ function finishSentence(){
 
 function enemyCounters(){
   const lv = fighterAt(state.levelIdx);
+  const counterIndex = state.enemyCounterCount++;
+  // Each opponent has a different readable counter pattern; the final boss adds slams.
+  const counterPatterns = [
+    ["quick","lunge","uppercut","quick"],
+    ["lunge","double","quick","heavy"],
+    ["uppercut","heavy","lunge","double"],
+    ["double","heavy","uppercut","lunge"],
+    ["quick","double","heavy","slam"]
+  ];
+  const pattern = counterPatterns[Math.min(state.levelIdx,counterPatterns.length-1)];
+  const counterMove = pattern[counterIndex % pattern.length];
+  const counterLabels = {quick:"QUICK COUNTER",lunge:"DASH COUNTER",uppercut:"UPPERCUT COUNTER",double:"DOUBLE COUNTER",heavy:"POWER COUNTER",slam:"GROUND SLAM"};
   state.playerHp = Math.max(0, state.playerHp - lv.atk);
-  popText("-" + lv.atk, false, "me");
-  spawnBurst("me"); addFlinch("me");
-  if(state.playerHp <= 0){ state.screen = "lose"; sndLose(); render(); return; }
+  popText(counterLabels[counterMove]+" · -"+lv.atk, counterMove==="heavy" || counterMove==="slam", "me");
+  animateEnemyStrike(counterMove);
+  if(state.playerHp <= 0){ stopFightStatsLoop(); recordFightProfileResult(false); state.screen = "lose"; sndLose(); render(); return; }
   refreshBars();
 }
 function addFlinch(who){
@@ -762,6 +1059,72 @@ function addFlinch(who){
   if(!el) return;
   el.classList.remove("flinch"); void el.offsetWidth; el.classList.add("flinch");
   setTimeout(()=>el && el.classList.remove("flinch"), 420);
+}
+function stageClassPulse(id, className, duration=460){
+  const el = document.getElementById(id);
+  if(!el) return;
+  // A fighter can only perform one primary move at a time. Remove older move
+  // classes first so a fast follow-up uses its own animation instead of inheriting one.
+  const exclusivePrefix = className.startsWith("move-") ? "move-" : (className.startsWith("counter-") ? "counter-" : null);
+  if(exclusivePrefix){
+    [...el.classList].filter(name=>name.startsWith(exclusivePrefix)).forEach(name=>el.classList.remove(name));
+  }
+  el.classList.remove(className); void el.offsetWidth; el.classList.add(className);
+  setTimeout(()=>el && el.classList.remove(className), duration);
+}
+function spawnHitSparks(host, critical=false){
+  const stage = document.getElementById("stage-"+host);
+  if(!stage) return;
+  const count = critical ? 12 : 7;
+  for(let i=0;i<count;i++){
+    const spark = document.createElement("span");
+    const angle = (Math.PI*2*i)/count + (Math.random()*.22);
+    const distance = (critical ? 48 : 34) + Math.random()*24;
+    spark.className = "combat-spark";
+    spark.style.setProperty("--dx", Math.cos(angle)*distance + "px");
+    spark.style.setProperty("--dy", Math.sin(angle)*distance + "px");
+    spark.style.setProperty("--rot", (angle*180/Math.PI) + "deg");
+    spark.style.setProperty("--spark-color", critical ? "var(--crit)" : (host === "enemy" ? "var(--e)" : "var(--p)"));
+    stage.appendChild(spark);
+    setTimeout(()=>spark.remove(), 460);
+  }
+}
+function animatePlayerStrike(move="jab",critical=false){
+  if(typeof move === "boolean"){critical=move;move=critical?"finisher":"jab";}
+  const moveDuration = move==="finisher"?660:(move==="spin" || move==="double" ? 600 : 540);
+  stageClassPulse("stage-me", "move-"+move, moveDuration);
+  stageClassPulse("stage-enemy", "impact-hit", 450);
+  if(move==="heavy" || move==="finisher") stageClassPulse("stage-enemy", "impact-heavy", 560);
+  if(move==="sweep") stageClassPulse("stage-enemy", "impact-sweep", 500);
+  if(move==="uppercut") stageClassPulse("stage-enemy", "impact-uppercut", 560);
+  if(move==="spin") stageClassPulse("stage-enemy", "impact-spin", 620);
+  if(move==="double") stageClassPulse("stage-enemy", "impact-double", 580);
+  if(move==="dash" || move==="rush") stageClassPulse("stage-enemy", "impact-dash", 520);
+  if(critical) stageClassPulse("stage-enemy", "critical-impact", 620);
+  addFlinch("enemy");
+  spawnBurst("enemy");
+  spawnHitSparks("enemy", critical || move==="heavy" || move==="finisher" || move==="spin");
+  if(move==="rush" || move==="finisher" || move==="spin") pulseCombo();
+}
+function animateEnemyStrike(move="quick"){
+  const clsByMove = {quick:"counter-quick",lunge:"counter-lunge",uppercut:"counter-uppercut",double:"counter-double",heavy:"counter-heavy",slam:"counter-slam"};
+  const cls = clsByMove[move] || "counter-quick";
+  const duration = move==="heavy" || move==="slam" ? 600 : (move==="double" ? 560 : 470);
+  stageClassPulse("stage-enemy", cls, duration);
+  stageClassPulse("stage-me", "impact-hit", 450);
+  stageClassPulse("stage-me", "player-impact", 450);
+  if(move==="heavy" || move==="slam") stageClassPulse("stage-me", "impact-heavy", 580);
+  if(move==="uppercut") stageClassPulse("stage-me", "impact-uppercut", 560);
+  if(move==="double") stageClassPulse("stage-me", "impact-double", 560);
+  addFlinch("me");
+  spawnBurst("me");
+  spawnHitSparks("me", move==="heavy" || move==="slam" || move==="double");
+}
+function pulseCombo(){
+  const arena = document.querySelector(".arena");
+  if(!arena) return;
+  arena.classList.remove("combo-surge"); void arena.offsetWidth; arena.classList.add("combo-surge");
+  setTimeout(()=>arena && arena.classList.remove("combo-surge"), 440);
 }
 function applyBruises(who, hp, max){
   const el = document.getElementById("stick-"+who);
@@ -789,32 +1152,46 @@ function refreshBars(){
   const hud = document.getElementById("hudBox"); if(hud) hud.innerHTML = hudHTML(lv);
   applyBruises("me", state.playerHp, PLAYER_HP);
   applyBruises("enemy", state.enemyHp, state.enemyMaxHp);
+  updateFightStats();
 }
 
 function spawnDefeatEffect(){
   const stage = document.getElementById("stage-enemy");
+  const arena = document.querySelector(".arena");
   if(!stage) return;
   stage.classList.add("enemy-defeat");
-  const ring = document.createElement("div");
-  ring.className = "defeat-ring";
-  stage.appendChild(ring);
-  for(let i=0;i<14;i++){
+  if(arena){ arena.classList.remove("ko-shake"); void arena.offsetWidth; arena.classList.add("ko-shake"); }
+  const rings = [];
+  for(let r=0;r<2;r++){
+    const ring = document.createElement("div");
+    ring.className = "defeat-ring";
+    ring.style.animationDelay = (r*.12)+"s";
+    ring.style.width = (r===0?32:22)+"px";
+    ring.style.height = (r===0?32:22)+"px";
+    stage.appendChild(ring); rings.push(ring);
+  }
+  for(let i=0;i<22;i++){
     const particle = document.createElement("div");
-    const angle = (Math.PI * 2 * i) / 14;
-    const distance = 58 + (i % 4) * 14;
+    const angle = (Math.PI * 2 * i) / 22;
+    const distance = 58 + (i % 5) * 17;
     particle.className = "defeat-particle";
+    particle.style.width = (i%3===0?12:7)+"px";
+    particle.style.height = (i%3===0?12:7)+"px";
+    particle.style.background = i%4===0 ? "var(--crit)" : "var(--e)";
     particle.style.setProperty("--dx", Math.cos(angle) * distance + "px");
     particle.style.setProperty("--dy", Math.sin(angle) * distance + "px");
     particle.style.setProperty("--rot", (i * 47) + "deg");
     stage.appendChild(particle);
-    setTimeout(()=>particle.remove(), 820);
+    setTimeout(()=>particle.remove(), 900);
   }
-  setTimeout(()=>ring.remove(), 820);
+  rings.forEach(ring=>setTimeout(()=>ring.remove(), 900));
+  if(arena) setTimeout(()=>arena.classList.remove("ko-shake"), 460);
 }
 function defeatEnemy(){
   if(state.screen !== "fight") return;
   clearTimeout(state.idleTimer);
   state.idleTimer = null;
+  stopFightStatsLoop();
   state.screen = "defeating";
   popText("K.O.!", true, "en");
   spawnDefeatEffect();
@@ -826,6 +1203,8 @@ function defeatEnemy(){
 }
 function winLevel(){
   clearTimeout(state.idleTimer);
+  stopFightStatsLoop();
+  recordFightProfileResult(true);
   state.screen = "win";
   sndWin();
   render();
@@ -835,6 +1214,8 @@ function pauseGame(){
   clearTimeout(state.idleTimer);
   state.idleTimer = null;
   state.pauseStartedAt = Date.now();
+  state.fightPausedAt = Date.now();
+  stopFightStatsLoop();
   state.screen = "pause";
   render();
 }
@@ -843,17 +1224,65 @@ function resumeGame(){
   if(state.pauseStartedAt && state.sentenceStart){
     state.sentenceStart += Date.now() - state.pauseStartedAt;
   }
+  if(state.fightPausedAt && state.fightStartedAt){ state.fightPausedTotal += Date.now() - state.fightPausedAt; }
+  state.fightPausedAt = 0;
   state.pauseStartedAt = 0;
   state.screen = "fight";
   render();
 }
 function leavePausedGame(){
   if(state.screen !== "pause") return;
+  stopFightStatsLoop();
+  state.fightPausedAt = 0;
   state.pauseStartedAt = 0;
   state.ignoreNextSpace = false;
   state.screen = "start";
   render();
 }
+function fightElapsedMs(){
+  if(!state.fightStartedAt) return 0;
+  const end = state.fightPausedAt || Date.now();
+  return Math.max(0, end - state.fightStartedAt - state.fightPausedTotal);
+}
+function updateFightStats(){
+  const wpmEl = document.getElementById("fightWpm");
+  if(!wpmEl) return;
+  const elapsed = fightElapsedMs();
+  const wpm = elapsed > 0 ? Math.round((state.correctChars/5) / (Math.max(elapsed, 5000)/60000)) : 0;
+  const attempts = state.correctChars + state.mistakeKeys;
+  const accuracy = attempts ? Math.round(state.correctChars/attempts*100) : 100;
+  const values = {
+    fightWpm:wpm,
+    fightAccuracy:accuracy+"%",
+    fightCombo:"x"+(1+Math.min(state.combo,4)*.25).toFixed(2),
+    fightDamage:state.levelDamageDealt
+  };
+  Object.entries(values).forEach(([id,value])=>{ const el=document.getElementById(id); if(el) el.textContent=value; });
+  const sentenceFill = document.getElementById("sentenceProgressFill");
+  const sentenceCount = document.getElementById("sentenceProgressCount");
+  const sentencePct = state.current.length ? Math.round(state.typed.length/state.current.length*100) : 0;
+  if(sentenceFill) sentenceFill.style.width = sentencePct+"%";
+  if(sentenceCount) sentenceCount.textContent = state.typed.length+" / "+state.current.length+" chars";
+  const campaignFill = document.getElementById("campaignProgressFill");
+  const campaignCount = document.getElementById("campaignProgressCount");
+  const enemyProgress = state.enemyMaxHp ? 1-(state.enemyHp/state.enemyMaxHp) : 0;
+  const campaignPct = ((state.levelIdx + enemyProgress)/FIGHTERS.length)*100;
+  if(campaignFill) campaignFill.style.width = Math.max(0,Math.min(100,campaignPct))+"%";
+  if(campaignCount) campaignCount.textContent = "FIGHTER "+String(state.levelIdx+1).padStart(2,"0")+" / 0"+FIGHTERS.length;
+}
+function startFightStatsLoop(){
+  stopFightStatsLoop();
+  updateFightStats();
+  state.statsTimer = setInterval(()=>{
+    if(state.screen === "fight") updateFightStats();
+    else stopFightStatsLoop();
+  },500);
+}
+function stopFightStatsLoop(){
+  clearInterval(state.statsTimer);
+  state.statsTimer = null;
+}
+
 function resetIdle(){ clearTimeout(state.idleTimer); scheduleIdleCheck(); }
 function scheduleIdleCheck(){
   clearTimeout(state.idleTimer);
@@ -876,6 +1305,7 @@ function goHomeFromLogo(){
   // Leave any active mode cleanly: no idle attacks, countdowns, or stale defeat callbacks.
   clearTimeout(state.idleTimer);
   state.idleTimer = null;
+  stopFightStatsLoop();
   clearTimeout(state.defeatTimer);
   state.defeatTimer = null;
   if(speedState){
@@ -894,7 +1324,9 @@ function goHomeFromLogo(){
 
 /* ---------------- RENDER ---------------- */
 function render(){
+  document.body.dataset.screen = state.screen;
   if(state.screen === "start") return renderStart();
+  if(state.screen === "dashboard") return renderDashboard();
   if(state.screen === "tutorial") return renderTutorial();
   if(state.screen === "tierselect") return renderTierSelect();
   if(state.screen === "fight") return renderFight();
@@ -909,7 +1341,29 @@ function render(){
 }
 
 function hudHTML(lv){
-  return "<span>Combo <b class='combo-tag'>x"+(1+Math.min(state.combo,4)*0.25).toFixed(2)+"</b></span><span>Goal <b>"+lv.wpmGoal+" wpm</b></span><span>Sentences <b>"+state.totalSentences+"</b></span>";
+  return "<span>Speed target <b>"+lv.wpmGoal+" wpm</b></span><span>Sentences cleared <b>"+state.totalSentences+"</b></span>";
+}
+function fightStatsHTML(){
+  return "<div class='fight-stats' id='fightStats'>"+
+    "<div class='fight-stat speed'><span>Live speed</span><b id='fightWpm'>0</b></div>"+
+    "<div class='fight-stat accuracy'><span>Accuracy</span><b id='fightAccuracy'>100%</b></div>"+
+    "<div class='fight-stat combo'><span>Combo</span><b id='fightCombo'>x1.00</b></div>"+
+    "<div class='fight-stat damage'><span>Damage dealt</span><b id='fightDamage'>0</b></div>"+
+  "</div>";
+}
+function fightProgressHTML(){
+  const stagePct = state.enemyMaxHp ? ((state.levelIdx + (1-state.enemyHp/state.enemyMaxHp))/FIGHTERS.length)*100 : 0;
+  return "<div class='campaign-progress'>"+
+    "<div class='campaign-progress-head'><span>Campaign progress</span><strong id='campaignProgressCount'>FIGHTER "+String(state.levelIdx+1).padStart(2,"0")+" / 0"+FIGHTERS.length+"</strong></div>"+
+    "<div class='progress-track'><span id='campaignProgressFill' style='width:"+Math.max(0,Math.min(100,stagePct))+"%'></span></div>"+
+  "</div>";
+}
+function sentenceProgressHTML(){
+  const pct = state.current.length ? Math.round(state.typed.length/state.current.length*100) : 0;
+  return "<div class='sentence-progress'>"+
+    "<div class='sentence-progress-head'><span>Sentence progress</span><strong id='sentenceProgressCount'>"+state.typed.length+" / "+state.current.length+" chars</strong></div>"+
+    "<div class='progress-track'><span id='sentenceProgressFill' style='width:"+pct+"%'></span></div>"+
+  "</div>";
 }
 function progressHTML(){
   return "<div class='progress'>"+FIGHTERS.map((l,i)=>{
@@ -929,6 +1383,7 @@ function renderStart(){
       "<div class='home-actions'>"+
         "<button class='btn' id='startBtn'>Fight Mode</button>"+
         "<button class='btn ghost' id='speedBtn'>Speed Test</button>"+
+        "<button class='btn ghost dashboard-btn' id='dashboardBtn'>My Dashboard</button>"+
       "</div>"+
     "</div>"+
     "<aside class='home-panel'>"+
@@ -948,6 +1403,42 @@ function renderStart(){
     else { state.screen = "tutorial"; tutTypedLen = 0; render(); }
   });
   document.getElementById("speedBtn").addEventListener("click", ()=>{ state.screen = "speedmenu"; render(); });
+  document.getElementById("dashboardBtn").addEventListener("click", ()=>{ state.screen = "dashboard"; render(); });
+}
+
+function renderDashboard(){
+  const st = profile.stats;
+  const bestOverall = Math.max(st.bestSpeedWpm,st.bestFightWpm);
+  const totalTime = Math.floor(st.totalTypingMs/60000);
+  const recentHTML = profile.recent.length ? profile.recent.map(item=>{
+    const date = item.date ? new Date(item.date).toLocaleDateString(undefined,{month:"short",day:"numeric"}) : "";
+    return "<div class='recent-item'><div><strong>"+esc(item.label)+"</strong><span>"+esc(item.mode)+" · "+date+"</span></div><div class='recent-result'>"+item.wpm+" WPM<br><span>"+item.accuracy+"% accuracy</span></div></div>";
+  }).join("") : "<div class='dashboard-empty'>Your recent sessions will appear here. Complete a fight or a speed test to start building your record.</div>";
+  app.innerHTML =
+  "<section class='screen dashboard-screen'>"+
+    "<div class='dashboard-heading'><div><h1>Personal <span>Dashboard</span></h1><p class='sub'>Your typing progress, personal records and recent sessions.</p></div><button class='btn ghost' id='dashboardHome'>Back to Home</button></div>"+
+    "<div class='dashboard-profile'><div class='dashboard-profile-copy'><div class='eyebrow'>PLAYER PROFILE</div><h2>Welcome, "+esc(profile.nickname)+".</h2><p>Your profile is stored in this browser. No account or sign-in is needed.</p></div><div><div class='nickname-form'><input class='nickname-input' id='nicknameInput' type='text' maxlength='18' autocomplete='nickname' value='"+esc(profile.nickname)+"' placeholder='Enter your nickname' aria-label='Your nickname'><button class='nickname-save' id='saveNickname' type='button'>Save name</button></div><div class='dash-save-note' id='nicknameSaveNote' aria-live='polite'></div></div></div>"+
+    "<div class='dashboard-stats'>"+
+      "<div class='dashboard-stat'><span>Best overall WPM</span><b>"+bestOverall+"</b><small>Speed tests and fights</small></div>"+
+      "<div class='dashboard-stat'><span>Overall accuracy</span><b>"+profileOverallAccuracy()+"%</b><small>Across recorded sessions</small></div>"+
+      "<div class='dashboard-stat'><span>Fights won</span><b>"+st.fightsWon+"</b><small>Out of "+st.fightsPlayed+" completed fights</small></div>"+
+      "<div class='dashboard-stat'><span>Campaigns cleared</span><b>"+st.campaignsWon+"</b><small>Full five-fighter runs</small></div>"+
+      "<div class='dashboard-stat'><span>Speed tests</span><b>"+st.speedTests+"</b><small>One- and three-minute tests</small></div>"+
+      "<div class='dashboard-stat'><span>Characters correct</span><b>"+st.totalCorrectChars.toLocaleString()+"</b><small>Across all recorded sessions</small></div>"+
+      "<div class='dashboard-stat'><span>Time typing</span><b>"+totalTime+" min</b><small>Active typing time</small></div>"+
+      "<div class='dashboard-stat'><span>Best fight speed</span><b>"+st.bestFightWpm+" WPM</b><small>Best sentence speed</small></div>"+
+    "</div>"+
+    "<div class='dashboard-lower'><section class='dashboard-panel'><h3>Recent activity</h3><div class='recent-list'>"+recentHTML+"</div></section><section class='dashboard-panel'><h3>Your milestones</h3><div class='recent-item'><div><strong>Typing consistency</strong><span>Total incorrect keystrokes</span></div><div class='recent-result'>"+st.totalMistakes.toLocaleString()+"</div></div><div class='recent-item'><div><strong>Combat record</strong><span>Total damage dealt</span></div><div class='recent-result'>"+st.totalDamage.toLocaleString()+"</div></div><div class='recent-item'><div><strong>Sentence practice</strong><span>Sentences completed in fights</span></div><div class='recent-result'>"+st.totalSentences.toLocaleString()+"</div></div><div class='recent-item'><div><strong>Campaign attempts</strong><span>Started campaigns</span></div><div class='recent-result'>"+st.campaignsStarted.toLocaleString()+"</div></div></section></div>"+
+  "</section>";
+  document.getElementById("dashboardHome").addEventListener("click",()=>{state.screen="start";render();});
+  document.getElementById("saveNickname").addEventListener("click",()=>{
+    const input=document.getElementById("nicknameInput");
+    const name=(input.value||"").trim().replace(/\s+/g," ").slice(0,18)||"Player";
+    profile.nickname=name;saveProfile();
+    const note=document.getElementById("nicknameSaveNote");if(note) note.textContent="Name saved";
+    const title=app.querySelector(".dashboard-profile-copy h2");if(title) title.textContent="Welcome, "+name+".";
+  });
+  document.getElementById("nicknameInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();document.getElementById("saveNickname").click();}});
 }
 
 function renderTutorial(){
@@ -1011,7 +1502,10 @@ function renderTierSelect(){
   "</div>"+
   "</section>";
   app.querySelectorAll(".tiercard").forEach(b=>b.addEventListener("click", ()=>{
-    state.tier = b.dataset.t; resetRun(); startLevel(0);
+    state.tier = b.dataset.t; resetRun();
+    state.profileCampaignRecorded = false;
+    profile.stats.campaignsStarted++; saveProfile();
+    startLevel(0);
   }));
 }
 
@@ -1020,9 +1514,10 @@ function renderFight(){
   app.innerHTML =
   "<section class='screen fight-screen'>"+
   "<div class='fight-topbar'><button class='pause-btn' id='pauseBtn' type='button' aria-label='Pause game'>Ⅱ &nbsp; Pause</button></div>"+
+  fightProgressHTML()+
   progressHTML()+
   "<div class='arena'>"+
-    "<div class='fighter me'><div class='name'>You</div><div class='stage' id='stage-me'><div class='pop-host' id='popMe' style='position:absolute;inset:0'></div>"+stickmanSVG("me")+"</div><div class='hpwrap'><div class='hp me' id='hpMe' style='width:"+(state.playerHp/PLAYER_HP*100)+"%'></div></div></div>"+
+    "<div class='fighter me'><div class='name'>"+esc(profile.nickname)+"</div><div class='stage' id='stage-me'><div class='pop-host' id='popMe' style='position:absolute;inset:0'></div>"+stickmanSVG("me")+"</div><div class='hpwrap'><div class='hp me' id='hpMe' style='width:"+(state.playerHp/PLAYER_HP*100)+"%'></div></div></div>"+
     "<div class='fighter enemy'><div class='name'>"+esc(lv.name)+(lv.boss?"<span class='boss-tag'>BOSS</span>":"")+
       (lv.boss?"<span class='shield-tag' id='shieldTag' style='display:"+(state.shield?"inline-flex":"none")+"'>🛡 SHIELD ACTIVE</span>":"")+
       "</div><div class='stage' id='stage-enemy'>"+
@@ -1030,6 +1525,8 @@ function renderFight(){
       "<div class='pop-host' id='popEn' style='position:absolute;inset:0'></div>"+stickmanSVG("enemy")+"</div><div class='hpwrap'><div class='hp en' id='hpEn' style='width:"+(state.enemyHp/state.enemyMaxHp*100)+"%'></div></div></div>"+
   "</div>"+
   "<div class='hud' id='hudBox'>"+hudHTML(lv)+"</div>"+
+  fightStatsHTML()+
+  sentenceProgressHTML()+
   "<div class='target combat-target' id='targetBox' tabindex='0'></div>"+
   "<input id='typebox' autocomplete='off' autocapitalize='off' spellcheck='false'>"+
   "</section>";
@@ -1043,6 +1540,8 @@ function renderFight(){
   bindTyping();
   applyBruises("me", state.playerHp, PLAYER_HP);
   applyBruises("enemy", state.enemyHp, state.enemyMaxHp);
+  updateFightStats();
+  startFightStatsLoop();
   if(state.shield){
     const shieldVisual = document.getElementById("bossShieldVisual");
     if(shieldVisual) shieldVisual.style.display = "block";
@@ -1094,7 +1593,11 @@ function renderWin(){
     "<div class='row'><span>Sentences typed</span><b>"+state.totalSentences+"</b></div>"+
     "<div class='row'><span>Perfect sentences</span><b>"+state.perfectSentences+"</b></div>"+
     "<div class='row'><span>Avg speed</span><b>"+avgWpm+" wpm</b></div>"+
+    "<div class='row'><span>Best sentence speed</span><b>"+state.bestSentenceWpm+" wpm</b></div>"+
     "<div class='row'><span>Accuracy</span><b>"+accuracy+"%</b></div>"+
+    "<div class='row'><span>Correct characters</span><b>"+state.correctChars+"</b></div>"+
+    "<div class='row'><span>Mistakes</span><b>"+state.mistakeKeys+"</b></div>"+
+    "<div class='row'><span>Damage dealt</span><b>"+state.levelDamageDealt+"</b></div>"+
     "<div class='row score'><span>Score (speed × accuracy)</span><b>"+score+"</b></div>"+
     "<div class='row'><span>Best for this fighter</span><b>"+(isNewBest?score:prevBest)+(isNewBest?" — New Best!":"")+"</b></div>"+
   "</div>"+
@@ -1108,11 +1611,13 @@ function renderWin(){
 }
 
 function renderLose(){
+  const {accuracy, avgWpm} = statsFrom(state.correctChars, state.mistakeKeys, state.wpmSum, state.wpmCount);
   app.innerHTML =
   "<section class='screen center'>"+
   progressHTML()+
   "<h1>You <span style='color:var(--e)'>Fell</span></h1>"+
   "<p class='sub'>"+esc(FIGHTERS[state.levelIdx].name)+" got the better of you this time. Slow down a little, stay accurate, and try again.</p>"+
+  "<div class='result'><div class='row'><span>Average speed</span><b>"+avgWpm+" wpm</b></div><div class='row'><span>Accuracy</span><b>"+accuracy+"%</b></div><div class='row'><span>Sentences cleared</span><b>"+state.totalSentences+"</b></div><div class='row'><span>Mistakes</span><b>"+state.mistakeKeys+"</b></div></div>"+
   "<button class='btn' id='retryBtn'>Retry Fighter</button>"+
   "<button class='btn ghost' id='homeBtn'>Back to Start</button>"+
   "<p class='hint'>Press Enter to retry.</p>"+
@@ -1122,6 +1627,7 @@ function renderLose(){
 }
 
 function renderChampion(){
+  if(!state.profileCampaignRecorded){profile.stats.campaignsWon++;state.profileCampaignRecorded=true;saveProfile();}
   const {accuracy, avgWpm, score} = statsFrom(state.run.correctChars, state.run.mistakeKeys, state.run.wpmSum, state.run.wpmCount);
   const hs = highScores[state.tier];
   const isNewBest = score > hs.final;
@@ -1134,7 +1640,10 @@ function renderChampion(){
     "<div class='row'><span>Sentences typed</span><b>"+state.run.sentences+"</b></div>"+
     "<div class='row'><span>Perfect sentences</span><b>"+state.run.perfect+"</b></div>"+
     "<div class='row'><span>Avg speed</span><b>"+avgWpm+" wpm</b></div>"+
+    "<div class='row'><span>Best sentence speed</span><b>"+(state.run.bestWpm||0)+" wpm</b></div>"+
     "<div class='row'><span>Accuracy</span><b>"+accuracy+"%</b></div>"+
+    "<div class='row'><span>Correct characters</span><b>"+state.run.correctChars+"</b></div>"+
+    "<div class='row'><span>Mistakes</span><b>"+state.run.mistakeKeys+"</b></div>"+
     "<div class='row'><span>Total damage dealt</span><b>"+state.run.damageDealt+"</b></div>"+
     "<div class='row score'><span>Final score</span><b>"+score+"</b></div>"+
     "<div class='row'><span>Best run on "+TIER_INFO[state.tier].label+"</span><b>"+(isNewBest?score:hs.final)+(isNewBest?" — New Best!":"")+"</b></div>"+
@@ -1316,6 +1825,9 @@ function finishSpeedTest(){
   const total = speedState.correctChars + speedState.mistakeKeys;
   const accuracy = total > 0 ? Math.round(speedState.correctChars/total*100) : 100;
   speedState.result = {wpm, accuracy};
+  profile.stats.speedTests++;
+  profile.stats.bestSpeedWpm = Math.max(profile.stats.bestSpeedWpm,wpm);
+  addProfileActivity({mode:"Speed test",label:speedState.minutes+"-minute test",wpm,accuracy,correctChars:speedState.correctChars,mistakes:speedState.mistakeKeys,durationMs:speedState.durationMs});
   state.screen = "speedresult"; render();
 }
 function renderSpeedResult(){
